@@ -1,6 +1,9 @@
 package org.selwyn.kproducer
 
+import org.selwyn.kproducer.codec.AvroCodec
+
 import scala.collection.JavaConverters._
+import scala.io.Source
 import java.nio.ByteBuffer
 
 import com.amazonaws.auth._
@@ -10,6 +13,10 @@ import com.amazonaws.services.kinesis.{
   AmazonKinesis,
   AmazonKinesisClientBuilder
 }
+
+import org.apache.avro.generic.{GenericData, GenericRecord}
+import org.apache.avro.Schema
+import org.apache.avro.Schema.Parser
 
 case class AwsConfig(accessKey: String, secretKey: String)
 
@@ -33,11 +40,20 @@ object Main {
           new IllegalArgumentException(s"Unable to connect to '$streamName'"))
     } yield client
 
+    val avroFilename = "user.avsc"
+    val schema: Schema = new Parser()
+      .parse(Source.fromURL(getClass.getResource(s"/${avroFilename}")).mkString)
+    val avro: AvroCodec = new AvroCodec(schema)
+
     val complete = client.map(c => {
 
       // PRODUCE
-      val json: String = "{\"name\":\"johndoe\"}"
-      val data: ByteBuffer = ByteBuffer.wrap(serialize(json))
+      val user: GenericRecord = new GenericData.Record(schema)
+      user.put("id", 1234)
+      user.put("name", "john dow")
+      user.put("email", "john.doe@gmail.com")
+
+      val data: ByteBuffer = ByteBuffer.wrap(avro.encode(user))
       c.putRecord(streamName, data, partitionKey)
 
       // CONSUME

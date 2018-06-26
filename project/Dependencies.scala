@@ -10,8 +10,8 @@ object Dependencies {
 
   object V {
     // Scala
+    val avro                 = "1.8.2"
     val kinesisClient        = "1.9.1"
-    //val alpakkaKinesis       = "0.19"
 
     // Scala (test only)
     val scalatest            = "3.0.5"
@@ -20,7 +20,7 @@ object Dependencies {
   val Libraries = Seq(
     // Scala
     "com.amazonaws"         %  "amazon-kinesis-client"       % V.kinesisClient,
-    //"com.lightbend.akka"    %% "akka-stream-alpakka-kinesis" % V.alpakkaKinesis,
+    "org.apache.avro"       %  "avro"                        % V.avro,
 
     // Scala (test only)
     "org.scalatest"         %% "scalatest"                   % V.scalatest   % "test"
