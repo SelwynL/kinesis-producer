@@ -1,4 +1,4 @@
-# kinesis-producer
+# kproducer
 
 ## Run
 Running against Kinesalite requires disable of `CBOR` authentication
