@@ -1,0 +1,4 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/selwyn/development/kinesis-producer/project/Dependencies.scala:24:66: value scalactic is not a member of object Dependencies.V[0m
+[0m[[0m[31merror[0m] [0m[0m    "org.scalactic"         %% "scalactic"                   % V.scalactic,[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
