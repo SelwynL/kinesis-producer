@@ -1,4 +1,0 @@
-[0m[[0m[33mwarn[0m] [0m[0m/Users/selwyn/development/kinesis-producer/src/main/scala/org/selwyn/Main.scala:3:40: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport scala.collection.JavaConverters._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
-[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m

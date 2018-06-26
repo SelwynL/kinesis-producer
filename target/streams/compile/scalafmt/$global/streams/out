@@ -1,3 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0mError in /Users/selwyn/development/kinesis-producer/src/main/scala/org/selwyn/Main.scala: <input>:38: error: illegal start of simple expression[0m
-[0m[[0m[31merror[0m] [0m[0mval json: String = "{\"name\":\"selwyn\"}"[0m
-[0m[[0m[31merror[0m] [0m[0m      ^[0m
