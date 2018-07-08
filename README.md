@@ -14,7 +14,7 @@ To configure file locations and file names used by `docker-compose`, adjust the 
 ### 2. Docker Compose
 When SSL files are in place, create the required services using Docker Compose. This starts Kinesalite and Kafka. For Docker installation see [Docker](#docker-setup) section
 ```
-docker-compose up
+> docker-compose up
 ```
 
 ### 3. Run Application
