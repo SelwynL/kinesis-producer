@@ -1,29 +1,39 @@
 # kproducer
 
-## Run
-Running against Kinesalite requires disable of `CBOR` authentication
+## Getting started
+In order to run this application locally you'll need to bootstrap the development environment
+
+### 1. SSL
+To secure Kafka with SSL you'll need a keystore and trustore. If you already have these, add them to the appropriate `ssl/keystore` and `ssl/truststore` directories. If not, generate them by executing the provided script, and follow along with the prompts:
 ```
-AWS_CBOR_DISABLE=true sbt run
+> ./ssl/generate-kafka-ssl.sh
+```
+To configure file locations and file names used by `docker-compose`, adjust the `.env` file.
+
+### 2. Docker Compose
+When SSL files are in place, create the required services using Docker Compose. This starts Kinesalite and Kafka. For Docker installation see [Docker](#docker-setup) section
+```
+docker-compose up
 ```
 
-## Kinesalite
-Use NPM to install Kinesalite (Mock AWS Kinesis for local development)
+### 3. Run Application
+Start the application to generate some events. Running against Kinesalite (Kinesis) locally requires disable of `CBOR` authentication.
 ```
-> brew install node
-> npm install -g kinesalite
-```
-
-Start on port `7000`
-```
-> kinesalite --port 7000
+> AWS_CBOR_DISABLE=true sbt run
 ```
 
-Install AWS CLI
+## Docker Setup
+The local development environment is instantiated though `docker-compose`, this requires the install of Docker. See this [StackOverflow](https://stackoverflow.com/a/43365425) post for installing Docker on Mac with brew
+
+## Kinesalite Setup with AWS CLI
+Localstack is used to mock a Kinesis environment locally. See Localstack [documentation](https://github.com/localstack/localstack) for more info on other AWS services.
+
+To interact with Kinesalite, install AWS CLI
 ```
 > brew install awscli
 ```
 
-Use AWS CLI to communicate with Kinesalite, ensure you run `aws configure` or create a `~/.aws/credentials` file to set fake credentials
+Run `aws configure` or create a `~/.aws/credentials` file to set fake credentials
 ```
 [default]
 aws_access_key_id = FAKE
