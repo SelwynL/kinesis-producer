@@ -1,4 +1,5 @@
 # kproducer
+Avro/Json message producer for Kinesis and Kafka
 
 ## Getting started
 In order to run this application locally you'll need to bootstrap the development environment
