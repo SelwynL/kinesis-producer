@@ -15,7 +15,7 @@ lazy val root = project.in(file("."))
     shellPrompt   :=  { _ => "kproducer> "}
   )
   .settings(BuildSettings.wartremoverSettings)
-  .settings(BuildSettings.scalaFmtSettings)
+  //.settings(BuildSettings.scalaFmtSettings)
   .settings(BuildSettings.scalifySettings)
   .settings(BuildSettings.sbtAssemblySettings)
   .settings(

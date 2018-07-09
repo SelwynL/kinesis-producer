@@ -1,16 +1,13 @@
 package org.selwyn.kproducer
 
 import org.selwyn.kproducer.codec.AvroCodec
+import org.selwyn.kproducer.model.{AWSCredentials, AWSRegion, KProducerOutcome}
+import org.selwyn.kproducer.producer.KinesisAvroProducer
+
 import scala.collection.JavaConverters._
 import scala.io.Source
-import java.nio.ByteBuffer
-import com.amazonaws.auth._
-import com.amazonaws.services.kinesis.model._
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.kinesis.{
-  AmazonKinesis,
-  AmazonKinesisClientBuilder
-}
+import com.amazonaws.services.kinesis.AmazonKinesis
+import com.amazonaws.services.kinesis.model.{GetRecordsRequest, PutRecordResult, Record, StreamDescription}
 import org.apache.avro.generic.{GenericData, GenericRecord}
 import org.apache.avro.Schema
 import org.apache.avro.Schema.Parser
@@ -23,28 +20,62 @@ object Main {
     val streamName = "config-store-local"
     val partitionKey = "config-store-local-key"
     val endpoint = "http://localhost:7000"
-    val region = "us-east-1"
+    val region = AWSRegion.USEast1
 
-    val client: Either[Throwable, AmazonKinesis] = for {
-      provider <- getProvider()
-      client = createKinesisClient(provider, endpoint, region)
-      exists <- if (streamExists(client, streamName)) Right(true)
-      else
-        Left(
-          new IllegalArgumentException(s"Unable to connect to '$streamName'"))
-    } yield client
+    //val (lensConfig, avroCodec) : (GenericRecord, AvroCodec) = generateUser(1)
+    val (lensConfig, avroCodec) : (GenericRecord, AvroCodec) = generateLensConfig()
 
-    // val avroFilename = "user.avsc"
-    val avroFilename = "lens_config.avsc"
+    val credentials: AWSCredentials = AWSCredentials("default", "default")
+    val eitherKinesisClient: Either[Throwable, AmazonKinesis] =
+      KinesisAvroProducer.createKinesisClient(credentials, endpoint, region)
 
-    val schema: Schema = new Parser()
-      .parse(Source.fromURL(getClass.getResource(s"/${avroFilename}")).mkString)
-    val avro: AvroCodec = new AvroCodec(schema)
+    val eitherKinesisProducer: Either[Throwable, KinesisAvroProducer] =
+      eitherKinesisClient.map(client => new KinesisAvroProducer(client, avroCodec))
 
-    // val user: GenericRecord = new GenericData.Record(schema)
-    //     user.put("id", i)
-    //     user.put("name", "john dow")
-    //     user.put("email", "john.doe@gmail.com")
+    // PRODUCE to Kinesis
+    val produceResult: Either[Throwable, KProducerOutcome[PutRecordResult]] = eitherKinesisProducer.map(producer => {
+      producer.produce(streamName, partitionKey, lensConfig)
+    })
+    println(s">>> PRODUCE RESULT: $produceResult")
+
+    // CONSUME from Kinesis
+    val consumeResult: Either[Throwable, List[Record]] = eitherKinesisClient.map(client => {
+      val limit = 2000
+      val shardIteratorType = "TRIM_HORIZON"
+
+      val streamDescription: StreamDescription = client.describeStream(streamName).getStreamDescription
+      println(s"STREAM DESCRIPTION: $streamDescription")
+
+      streamDescription.getShards.asScala.toList.flatMap {
+        shard => {
+          println(s"SHARD: $shard")
+          val shardIterator: String = client.getShardIterator(streamName, shard.getShardId, shardIteratorType).getShardIterator
+          val recordRequest = new GetRecordsRequest().withShardIterator(shardIterator).withLimit(limit)
+          client.getRecords(recordRequest).getRecords.asScala.toList
+        }
+      }
+    })
+    println(s">>> CONSUME RESULT: $consumeResult")
+  }
+
+  private def avroSchema(avroResourceFilename: String): Schema = {
+    new Parser().parse(Source.fromURL(getClass.getResource(s"/${avroResourceFilename}")).mkString)
+  }
+
+  private def generateUser(id: Int): (GenericRecord, AvroCodec)= {
+    val schema = avroSchema("user.avsc")
+    val avroCodec: AvroCodec = new AvroCodec(schema)
+    val user: GenericRecord = new GenericData.Record(schema)
+    user.put("id", id)
+    user.put("name", "john dow")
+    user.put("email", "john.doe@gmail.com")
+
+    (user, avroCodec)
+  }
+
+  private def generateLensConfig(): (GenericRecord, AvroCodec) = {
+    val schema = avroSchema("lens_config.avsc")
+    val avroCodec: AvroCodec = new AvroCodec(schema)
 
     val lensSchema: Schema = schema.getField("lens").schema
     val fieldSchema: Schema =
@@ -61,13 +92,13 @@ object Main {
     val field: GenericRecord = new GenericData.Record(fieldSchema)
     field.put("name", "employeeId")
     field.put("indexType",
-              new GenericData.EnumSymbol(indexTypeSchema, "LookupIndex"))
+      new GenericData.EnumSymbol(indexTypeSchema, "LookupIndex"))
     field.put("fieldType",
-              new GenericData.EnumSymbol(fieldTypeSchema, "StringField"))
+      new GenericData.EnumSymbol(fieldTypeSchema, "StringField"))
     field.put("description", "Employee ID")
     field.put("required", true)
     field.put("sortOrder",
-              new GenericData.EnumSymbol(sortOrderSchema, "IgnoreSortOrder"))
+      new GenericData.EnumSymbol(sortOrderSchema, "IgnoreSortOrder"))
     lens.put("name", "C1_PHONEBOOK_Employee")
     lens.put("version", "0.1")
     lens.put("fields", List(field).asJava)
@@ -83,7 +114,7 @@ object Main {
     val operationalStore: GenericRecord =
       new GenericData.Record(operationalStoreSchema)
     operationalStore.put("storeType",
-                         new GenericData.EnumSymbol(storeTypeSchema, "redis"))
+      new GenericData.EnumSymbol(storeTypeSchema, "redis"))
     operationalStore.put("region", "us-east-1")
     operationalStore.put("connectionString", "http://localhost:6379")
 
@@ -92,62 +123,6 @@ object Main {
     lensConfig.put("streamReader", streamReader.asJava)
     lensConfig.put("operationalStore", operationalStore)
 
-    val complete = client.map(c => {
-      val max = 1
-      for (i <- 1 to max) {
-        // PRODUCE
-        println(s"Producing to stream: ${lensConfig}")
-        //val data: ByteBuffer = ByteBuffer.wrap(avro.encode(user))
-        val data: ByteBuffer = ByteBuffer.wrap(avro.encode(lensConfig))
-        val result = c.putRecord(streamName, data, partitionKey)
-        println(s"RESULT: ${result}")
-      }
-
-      // CONSUME
-      // val shardId = ""
-      // val limit = 2000
-      // val shardIteratorType = "TRIM_HORIZON"
-
-      // val streamDescription: StreamDescription = c.describeStream(streamName).getStreamDescription()
-      // println("STREAM DESCRIPTION: " + streamDescription)
-
-      // val result: List[Record] = streamDescription.getShards().asScala.toList.map {
-      //   shard => {
-      //     println("SHARD: " + shard)
-      //     val shardIterator: String = c.getShardIterator(streamName, shard.getShardId(), shardIteratorType).getShardIterator()
-      //     val recordRequest = new GetRecordsRequest().withShardIterator(shardIterator).withLimit(limit)
-      //     c.getRecords(recordRequest).getRecords().asScala.toList
-      //   }
-      // }.flatten
-
-      // println("RESULTS: " + result)
-      "SUCCESS"
-    })
-
-    println(s"COMPLETED: ${complete}")
+    (lensConfig, avroCodec)
   }
-
-  private def serialize(string: String) = string.getBytes;
-
-  private def getProvider(): Either[Throwable, AWSCredentialsProvider] = {
-    Right(new DefaultAWSCredentialsProviderChain())
-  }
-
-  private def createKinesisClient(provider: AWSCredentialsProvider,
-                                  endpoint: String,
-                                  region: String): AmazonKinesis =
-    AmazonKinesisClientBuilder
-      .standard()
-      .withCredentials(provider)
-      .withEndpointConfiguration(new EndpointConfiguration(endpoint, region))
-      .build()
-
-  private def streamExists(client: AmazonKinesis, name: String): Boolean =
-    try {
-      val describeStreamResult = client.describeStream(name)
-      val status = describeStreamResult.getStreamDescription.getStreamStatus
-      status == "ACTIVE" || status == "UPDATING"
-    } catch {
-      case rnfe: ResourceNotFoundException => false
-    }
 }
