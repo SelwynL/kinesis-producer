@@ -12,7 +12,7 @@ import com.amazonaws.services.kinesis.model.{PutRecordRequest, PutRecordResult}
 import org.apache.avro.generic.GenericRecord
 
 class KinesisAvroProducer(client: AmazonKinesis, avroCodec: AvroCodec)
-  extends KinesisProducer(client) with KProducer[GenericRecord, PutRecordResult] {
+  extends KinesisClient(client) with KProducer[GenericRecord, PutRecordResult] {
 
   override def produce(topic: String, key: String, payload: GenericRecord): KProducerOutcome[PutRecordResult] =
     Try(ByteBuffer.wrap(avroCodec.encode(payload))).fold[KProducerOutcome[PutRecordResult]](

@@ -6,7 +6,7 @@ import com.amazonaws.services.kinesis.model.{PutRecordRequest, PutRecordResult}
 
 import scala.util.Try
 
-abstract class KinesisProducer(client: AmazonKinesis) {
+abstract class KinesisClient(client: AmazonKinesis) {
   protected def produce(payload: PutRecordRequest): KProducerOutcome[PutRecordResult] =
     Try(client.putRecord(payload)).toEither
       .fold[KProducerOutcome[PutRecordResult]](

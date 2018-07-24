@@ -10,6 +10,7 @@ object Dependencies {
   object V {
     val avro                 = "1.8.2"
     val kinesisClient        = "1.9.1"
+    val kafka                = "1.1.1"
     val enumeratum           = "1.5.13"
     val jackson              = "2.6.7"
 
@@ -21,6 +22,7 @@ object Dependencies {
     "com.amazonaws"              %  "amazon-kinesis-client"  % V.kinesisClient,
     "com.fasterxml.jackson.core" %  "jackson-annotations"    % V.jackson,
     "org.apache.avro"            %  "avro"                   % V.avro,
+    "org.apache.kafka"           %% "kafka"                  % V.kafka,
     "com.beachape"               %% "enumeratum"             % V.enumeratum,
 
     // Test
