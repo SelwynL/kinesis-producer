@@ -24,9 +24,62 @@ Create a stream in Kinesalite as a target to produce/consume data from
 ```
 
 ### 4. Run Application
-Start the application to generate some events. Running against Kinesalite (Kinesis) locally requires disable of `CBOR` authentication.
+To run without building a fat jar use `sbt`. This will bring you into an SBT shell (shows `kproducer>`) where you can run further SBT commands. Running against Kinesalite (Kinesis) locally requires disable of `CBOR` authentication, so set that inline.
+
 ```
-> AWS_CBOR_DISABLE=true sbt run
+> AWS_CBOR_DISABLE=true sbt
+kproducer> 
+```
+
+The CLI parameters can be displayed by running `run --help`:
+```
+kproducer> run --help
+
+Usage: sbt run [options]
+Produce AVRO payload to Kinesis based on schema
+Where the supported options are the following:
+
+   -i | --in | --input  inputFile         Path to the JSON input file.
+   -s | --schema  schemaFile              Path to the Avro schema file.
+   -n | --stream-name  streamName         Name of the Kinesis stream.
+  [-p | --partition-key  partitionKey]    The field in the Avro schema to use as a partition key. If
+                                          not defined, defaults to the 'streamName'.
+  [-e | --end-point  endpoint]            Kinesis endpoint to use.
+                                          (default: http://localhost:7000)
+  [-r | --region  region]                 The AWS region for the Kinesis endpoint.
+                                          (default: us-east-1)
+  [-h | --h | --help]                     Show this help message.
+  [remaining]                             All remaining arguments that aren't associated with flags.
+
+You can also use --foo=bar syntax. Arguments shown in [...] are optional. All others are required.
+```
+
+Optionally you can build a fat jar and run CLI commands against it:
+```
+> sbt clean assembly
+```
+
+Running `--help` against the fatjar to show usage:
+```
+> java -jar target/scala-2.12/kproducer-0.0.1.jar --help
+
+Usage: sbt run [options]
+Produce AVRO payload to Kinesis based on schema
+Where the supported options are the following:
+
+   -i | --in | --input  inputFile         Path to the JSON input file.
+   -s | --schema  schemaFile              Path to the Avro schema file.
+   -n | --stream-name  streamName         Name of the Kinesis stream.
+  [-p | --partition-key  partitionKey]    The field in the Avro schema to use as a partition key. If
+                                          not defined, defaults to the 'streamName'.
+  [-e | --end-point  endpoint]            Kinesis endpoint to use.
+                                          (default: http://localhost:7000)
+  [-r | --region  region]                 The AWS region for the Kinesis endpoint.
+                                          (default: us-east-1)
+  [-h | --h | --help]                     Show this help message.
+  [remaining]                             All remaining arguments that aren't associated with flags.
+
+You can also use --foo=bar syntax. Arguments shown in [...] are optional. All others are required.
 ```
 
 ## Docker Setup
