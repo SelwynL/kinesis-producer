@@ -41,10 +41,10 @@ object BuildSettings {
   )
 
   // scalafmt settings
-//  import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
-//  lazy val scalaFmtSettings = Seq(
-//    scalafmtOnCompile := true
-//  )
+  import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
+  lazy val scalaFmtSettings = Seq(
+    scalafmtOnCompile := true
+  )
 
   // sbt-assembly settings for building an executable
   import sbtassembly.AssemblyPlugin.autoImport._

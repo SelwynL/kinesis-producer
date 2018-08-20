@@ -1,0 +1,20 @@
+{
+  "namespace": "kproducer.avro",
+   "type": "record",
+   "name": "User",
+   "fields":[
+       {
+          "name": "id", 
+          "type": "int"
+       },
+       {
+          "name": "name",  
+          "type": "string"
+       },
+       {
+          "name": "email", 
+          "type": ["null", "string"], 
+          "default": null
+       }
+   ]
+}

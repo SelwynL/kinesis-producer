@@ -9,8 +9,7 @@ abstract class KafkaClient(client: KafkaProducerClient[String, Array[Byte]]) {
   protected def produce(payload: ProducerRecord[String, Array[Byte]]): KProducerOutcome[RecordMetadata] = {
     // TODO: blocking call waiting on java.concurrent.Future.get()
     Try(client.send(payload).get()).toEither
-          .fold[KProducerOutcome[RecordMetadata]](
-          l => KProducerOutcome(payload = None, errorPayload = Some(l)),
-          r => KProducerOutcome(payload = Some(r), errorPayload = None))
+      .fold[KProducerOutcome[RecordMetadata]](l => KProducerOutcome(payload = None, errorPayload = Some(l)),
+                                              r => KProducerOutcome(payload = Some(r), errorPayload = None))
   }
 }

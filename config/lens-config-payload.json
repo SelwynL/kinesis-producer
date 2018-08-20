@@ -1,0 +1,35 @@
+{
+  "lensKey" : "someKey",
+  "lens" : {
+    "name" : "C1_PHONEBOOK_Employee",
+    "version" : "0.1",
+    "fields" : [
+      {
+        "name" : "employeeId",
+        "indexType" : "LOOKUP_INDEX",
+        "fieldType" : "STRING_FIELD",
+        "description" : "Employee ID",
+        "required" : true,
+        "sortOrder" : "IGNORE_SORT_ORDER"
+      }
+    ]
+  },
+  "streamReader" : {
+    "auto.offset.reset" : "latest",
+    "topic.subscriptions" : "test-employee",
+    "group.id" : "test-employee-group",
+    "bootstrap.servers" : "localhost:9093",
+    "schema.registry.url" : "http://localhost:8081"
+  },
+  "operationalStore" : {
+    "storeType" : "REST",
+    "region" : "US_EAST_1",
+    "connectionString" : "http://localhost:6379",
+    "clientId" : {
+      "string": "fake"
+    },
+    "clientSecret" : {
+      "string": "fake"
+    }
+  }
+}

@@ -14,7 +14,7 @@
        {
           "name": "email", 
           "type": ["null", "string"], 
-          "default": "null"
+          "default": null
        }
    ]
 }

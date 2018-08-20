@@ -5,7 +5,11 @@ import enumeratum.EnumEntry._
 
 import scala.collection.immutable
 
-sealed abstract class AWSRegion(override val entryName: String) extends EnumEntry with Hyphencase with Snakecase with Camelcase
+sealed abstract class AWSRegion(override val entryName: String)
+    extends EnumEntry
+    with Hyphencase
+    with Snakecase
+    with Camelcase
 
 object AWSRegion extends Enum[AWSRegion] {
   val values: immutable.IndexedSeq[AWSRegion] = findValues

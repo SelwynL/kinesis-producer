@@ -1,0 +1,177 @@
+{
+   "name": "LensLaunchConfig",
+   "namespace": "com.capitalone.cep",
+   "type": "record",
+   "fields": [
+     {
+       "name": "lensKey",
+       "type": "string"
+     },
+     {
+       "name": "lens",
+       "type": {
+         "name": "Lens",
+         "namespace": "com.capitalone.cep",
+         "type": "record",
+         "fields": [
+           {
+             "name": "name",
+             "type": "string"
+           },
+           {
+             "name": "version",
+             "type": "string"
+           },
+           {
+             "name": "fields",
+             "type": {
+               "type": "array",
+               "items": {
+                 "name": "Field",
+                 "type": "record",
+                 "namespace": "com.capitalone.cep.lens",
+                 "fields": [
+                   {
+                     "name": "name",
+                     "type": "string"
+                   },
+                   {
+                     "name": "indexType",
+                     "type": {
+                       "name": "IndexType",
+                       "namespace": "com.capitalone.cep.lens.field",
+                       "type": "enum",
+                       "symbols": [
+                         "LOOKUP_INDEX",
+                         "SORT_INDEX",
+                         "FULL_TEXT_SEARCH_INDEX",
+                         "NO_INDEX"
+                       ]
+                     }
+                   },
+                   {
+                     "name": "fieldType",
+                     "type": {
+                       "name": "FieldType",
+                       "namespace": "com.capitalone.cep.lens.field",
+                       "type": "enum",
+                       "symbols": [
+                         "BYTE_FIELD",
+                         "INT_FIELD",
+                         "SHORT_FIELD",
+                         "LONG_FIELD",
+                         "FLOAT_FIELD",
+                         "DOUBLE_FIELD",
+                         "BOOLEAN_FIELD",
+                         "STRING_FIELD",
+                         "BYTE_BUFFER_FIELD",
+                         "STRING_LIST",
+                         "NUMBER_LIST",
+                         "GEO_POINT_FIELD",
+                         "RECORD"
+                       ]
+                     }
+                   },
+                   {
+                     "name": "description",
+                     "type": "string"
+                   },
+                   {
+                     "name": "required",
+                     "type": "boolean"
+                   },
+                   {
+                     "name": "sortOrder",
+                     "type": {
+                       "name": "SortOrder",
+                       "namespace": "com.capitalone.cep.lens.field",
+                       "type": "enum",
+                       "symbols": [
+                         "ASCENDING_SORT_ORDER",
+                         "DESCENDING_SORT_ORDER",
+                         "IGNORE_SORT_ORDER"
+                       ]
+                     }
+                   }
+                 ]
+               }
+             }
+           },
+           {
+             "name": "includeRecord",
+             "type": [
+               "null",
+               "boolean"
+             ],
+             "default": null
+           }
+         ]
+       }
+     },
+     {
+       "name": "streamReader",
+       "type": {
+         "name": "StringMap",
+         "type": "map",
+         "values": "string"
+       }
+     },
+     {
+       "name": "operationalStore",
+       "type": {
+         "name": "OperationalStore",
+         "namespace": "com.capitalone.cep.lens.store",
+         "type": "record",
+         "fields": [
+           {
+             "name": "storeType",
+             "type": {
+               "name": "StoreType",
+               "namespace": "com.capitalone.cep.lens.store",
+               "type": "enum",
+               "symbols": [
+                 "REDIS",
+                 "ELASTICSEARCH",
+                 "DYNAMODB",
+                 "POSTGRES",
+                 "REST"
+               ]
+             }
+           },
+           {
+             "name": "region",
+             "type": {
+               "name": "Region",
+               "namespace": "com.capitalone.cep.lens.region",
+               "type": "enum",
+               "symbols": [
+                 "US_EAST_1",
+                 "US_WEST_2"
+               ]
+             }
+           },
+           {
+             "name": "connectionString",
+             "type": "string"
+           },
+           {
+             "name": "clientId",
+             "type": [
+               "null",
+               "string"
+             ],
+             "default": null
+           },
+           {
+             "name": "clientSecret",
+             "type": [
+               "null",
+               "string"
+             ],
+             "default": null
+           }
+         ]
+       }
+     }
+   ]
+ }

@@ -1,0 +1,6 @@
+{
+  "lensKey": "some-key",
+  "command": {
+    "commandType": "START"
+  }
+}

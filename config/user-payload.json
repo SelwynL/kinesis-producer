@@ -1,0 +1,7 @@
+{
+  "id": 1234,
+  "name": "john doe",
+  "email": {
+    "string" : "john.doe@gmail.com"
+  }
+}

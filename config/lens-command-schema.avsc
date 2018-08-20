@@ -1,0 +1,43 @@
+{
+  "name": "LensCommandConfig",
+  "namespace": "com.capitalone.cep",
+  "type": "record",
+  "fields": [
+    {
+      "name": "lensKey",
+      "type": "string"
+    },
+    {
+      "name": "command",
+      "type": {
+        "name": "Command",
+        "namespace": "com.capitalone.cep",
+        "type": "record",
+        "fields": [
+          {
+            "name": "commandType",
+            "type": {
+              "name": "StoreType",
+              "namespace": "com.capitalone.cep.lens.command",
+              "type": "enum",
+              "symbols": [
+                "START",
+                "SCALE",
+                "STOP",
+                "DELETE"
+              ]
+            }
+          },
+          {
+            "name": "commandParam",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null
+          }
+        ]
+      }
+    }
+  ]
+}

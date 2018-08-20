@@ -26,8 +26,6 @@ case class AWSCredentials(accessKeyId: String, secretKey: String) {
       case (a, s) if isProfile(a) =>
         Right(new ProfileCredentialsProvider(s))
       case _ =>
-        Right(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKeyId, secretKey)))
+        Right(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, secretKey)))
     }).left.map((err: String) => new IllegalArgumentException(err))
 }

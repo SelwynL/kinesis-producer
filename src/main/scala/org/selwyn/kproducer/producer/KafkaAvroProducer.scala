@@ -9,13 +9,16 @@ import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata, KafkaP
 import scala.util.Try
 
 class KafkaAvroProducer(client: KafkaProducerClient[String, Array[Byte]], avroCodec: AvroCodec)
-  extends KafkaClient(client) with KProducer[GenericRecord, RecordMetadata] {
+    extends KafkaClient(client)
+    with KProducer[GenericRecord, RecordMetadata] {
 
   override def produce(topic: String, key: String, payload: GenericRecord): KProducerOutcome[RecordMetadata] =
-    Try(avroCodec.encode(payload)).fold[KProducerOutcome[RecordMetadata]](
-      f => KProducerOutcome(payload = None, errorPayload = Some(f)),
-      s => produce(new ProducerRecord(topic, key, s))
-    )
+    avroCodec
+      .encodeBytes(payload)
+      .fold(
+        f => KProducerOutcome(payload = None, errorPayload = Some(f)),
+        s => produce(new ProducerRecord(topic, key, s))
+      )
 }
 
 object KafkaAvroProducer {
